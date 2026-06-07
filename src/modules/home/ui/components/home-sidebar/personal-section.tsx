@@ -8,6 +8,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useAuth, useClerk } from "@clerk/nextjs";
 import {
   FlameIcon,
   HistoryIcon,
@@ -40,6 +41,8 @@ const items = [
 ];
 
 export const PersonalSection = () => {
+  const clerk = useClerk();
+  const { isSignedIn } = useAuth();
   return (
     <SidebarGroup>
       <SidebarGroupLabel>我的</SidebarGroupLabel>
@@ -50,7 +53,12 @@ export const PersonalSection = () => {
               <SidebarMenuButton
                 asChild
                 isActive={false} // TODO: active menuItem
-                onClick={() => {}} // TODO: menuItem点击事件
+                onClick={(e) => {
+                  if (!isSignedIn && item.auth) {
+                    e.preventDefault();
+                    return clerk.openSignIn();
+                  }
+                }}
               >
                 <Link href={item.url} className="flex items-center gap-4">
                   <item.icon />
