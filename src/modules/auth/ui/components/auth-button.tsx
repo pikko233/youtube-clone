@@ -1,12 +1,12 @@
 "use client";
 
-import { UserButton, SignInButton, ClerkProvider, Show } from "@clerk/nextjs";
+import { UserButton, SignInButton, Show } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { UserCircleIcon } from "lucide-react";
 
 export const AuthButton = () => {
   return (
-    <ClerkProvider>
+    <>
       <Show when="signed-out">
         <SignInButton mode="modal">
           <Button
@@ -21,6 +21,6 @@ export const AuthButton = () => {
       <Show when="signed-in">
         <UserButton />
       </Show>
-    </ClerkProvider>
+    </>
   );
 };
