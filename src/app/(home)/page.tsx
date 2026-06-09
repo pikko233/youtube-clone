@@ -1,25 +1,30 @@
 import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
-import Image from "next/image";
-import { ClientGreeting } from "./client-greeting";
+import { HomeView } from "@/modules/home/ui/views/home-view";
 
-export default async function Home() {
+export const dynamic = "force-dynamic";
+
+interface PageProps {
+  searchParams: Promise<{
+    categoryId?: string;
+  }>;
+}
+
+const Page = async ({ searchParams }: PageProps) => {
+  const { categoryId } = await searchParams;
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(
-    trpc.hello.queryOptions({
-      text: "world",
-    }),
-  );
+  await queryClient.prefetchQuery(trpc.categories.getMany.queryOptions());
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <ClientGreeting />
+      <HomeView categoryId={categoryId} />
     </HydrationBoundary>
   );
-  return (
-    <div>
-      <Image src="/logo.svg" height={50} width={50} alt="Logo" />
-      <p className="text-xl font-semibold tracking-tighter">NewTube</p>
-      <p>加载视频...</p>
-    </div>
-  );
+};
+
+interface PageProps {
+  searchParams: Promise<{
+    categoryId?: string;
+  }>;
 }
+
+export default Page;
