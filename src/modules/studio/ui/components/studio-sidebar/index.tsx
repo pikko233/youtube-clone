@@ -1,0 +1,51 @@
+"use client";
+
+import { Separator } from "@/components/ui/separator";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+} from "@/components/ui/sidebar";
+import { LogOutIcon, VideoIcon } from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { StudioSidebarHeader } from "./studio-sidebar-header";
+
+export const StudioSidebar = () => {
+  const pathname = usePathname();
+  return (
+    <Sidebar className="pt-16 z-40" collapsible="icon">
+      <SidebarContent className="bg-background">
+        <SidebarGroup>
+          <SidebarMenu className="gap-1">
+            <StudioSidebarHeader />
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                isActive={pathname === "/studio"}
+                tooltip="内容"
+                asChild
+              >
+                <Link href="/studio">
+                  <VideoIcon className="size-5" />
+                  <span className="text-sm">内容</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <Separator />
+            <SidebarMenuItem>
+              <SidebarMenuButton tooltip="退出工作室" asChild>
+                <Link href="/">
+                  <LogOutIcon className="size-5" />
+                  <span className="text-sm">退出工作室</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroup>
+      </SidebarContent>
+    </Sidebar>
+  );
+};

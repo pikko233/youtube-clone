@@ -4,6 +4,7 @@ import { TRPCReactProvider } from "@/trpc/client";
 
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { zhCN } from "@clerk/localizations";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={inter.className}>
       <body className="min-h-full flex flex-col">
-        <ClerkProvider>
+        <ClerkProvider localization={zhCN}>
           <TRPCReactProvider>{children}</TRPCReactProvider>
         </ClerkProvider>
       </body>
