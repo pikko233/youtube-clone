@@ -13,7 +13,7 @@ interface PageProps {
 const Page = async ({ searchParams }: PageProps) => {
   const { categoryId } = await searchParams;
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery(trpc.categories.getMany.queryOptions());
+  void queryClient.prefetchQuery(trpc.categories.getMany.queryOptions());
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
       <HomeView categoryId={categoryId} />
