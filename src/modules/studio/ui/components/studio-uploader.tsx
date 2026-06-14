@@ -20,8 +20,9 @@ export const StudioUploader = ({
   onSuccess,
 }: StudioUploaderProps) => {
   return (
-    <div>
+    <div className="py-5">
       <MuxUploader
+        onSuccess={onSuccess}
         endpoint={endpoint}
         id={UPLOADER_ID}
         className="hidden group/uploader"
