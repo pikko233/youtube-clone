@@ -36,10 +36,10 @@ export const StudioSidebar = () => {
             </SidebarMenuItem>
             <Separator />
             <SidebarMenuItem>
-              <SidebarMenuButton tooltip="退出工作室" asChild>
+              <SidebarMenuButton tooltip="退出工作台" asChild>
                 <Link href="/">
                   <LogOutIcon className="size-5" />
-                  <span className="text-sm">退出工作室</span>
+                  <span className="text-sm">退出工作台</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

@@ -17,26 +17,58 @@ import {
 import { useRouter } from "next/navigation";
 import { VideoThumbnail } from "@/modules/video/ui/components/video-thumbnail";
 import { Globe2Icon, LockIcon } from "lucide-react";
-
-const MUX_STATUS_LABELS: Record<string, string> = {
-  waiting: "等待上传",
-  preparing: "上传中",
-  ready: "上传完毕",
-  errored: "出错",
-};
-
-const getMuxStatusLabel = (status: string | null) => {
-  if (!status) return "无";
-  return MUX_STATUS_LABELS[status] ?? status;
-};
+import { Skeleton } from "@/components/ui/skeleton";
+import { getMuxStatusLabel, getVisibilityLabel } from "@/lib/utils";
 
 export const VideosSection = () => {
   return (
-    <Suspense fallback={<p>Loading...</p>}>
+    <Suspense fallback={<VideosSectionSkeleton />}>
       <ErrorBoundary fallback={<p>Error</p>}>
         <VideosSectionSuspense />
       </ErrorBoundary>
     </Suspense>
+  );
+};
+
+export const VideosSectionSkeleton = () => {
+  return (
+    <>
+      <div className="border-y">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="pl-6 w-[510px]">视频</TableHead>
+              <TableHead>是否可见</TableHead>
+              <TableHead>状态</TableHead>
+              <TableHead>发布日期</TableHead>
+              <TableHead>播放量</TableHead>
+              <TableHead>评论数</TableHead>
+              <TableHead>点赞量</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell className="pl-6 w-[510px]">
+                  <div className="flex items-center gap-4">
+                    <Skeleton className="h-20 w-36" />
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="h-4 w-[100px]" />
+                      <Skeleton className="h-3 w-[150px]" />
+                    </div>
+                  </div>
+                </TableCell>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <TableCell key={index}>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 };
 
@@ -106,9 +138,7 @@ export const VideosSectionSuspense = () => {
                       ) : (
                         <Globe2Icon className="size-4" />
                       )}
-                      <span>
-                        {video.visibility === "private" ? "私人" : "公开"}
-                      </span>
+                      <span>{getVisibilityLabel(video.visibility)}</span>
                     </div>
                   </TableCell>
                   <TableCell>{getMuxStatusLabel(video.muxStatus)}</TableCell>

@@ -22,7 +22,7 @@ export const AuthButton = () => {
         <UserButton>
           <UserButton.MenuItems>
             <UserButton.Link
-              label="工作室"
+              label="工作台"
               href="/studio"
               labelIcon={<ClapperboardIcon className="size-4" />}
             />

@@ -7,15 +7,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import { StudioUploader } from "./studio-uploader";
+import { useRouter } from "next/navigation";
 
 export const StudioUploadModel = () => {
+  const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const create = useMutation(
     trpc.video.create.mutationOptions({
-      onSuccess: () => {
+      onSuccess: async () => {
         toast.success("草稿视频已创建");
-        queryClient.invalidateQueries(
+        await queryClient.invalidateQueries(
           trpc.studio.getMany.infiniteQueryFilter(), // 只刷新studio列表
         );
       },
@@ -25,6 +27,13 @@ export const StudioUploadModel = () => {
     }),
   );
 
+  const onSuccess = () => {
+    if (!create.data?.video.id) return;
+
+    create.reset();
+    router.push(`/studio/videos/${create.data.video.id}`);
+  };
+
   return (
     <>
       <ResponsiveModal
@@ -33,7 +42,7 @@ export const StudioUploadModel = () => {
         onOpenChange={() => create.reset()}
       >
         {create.data?.url ? (
-          <StudioUploader endpoint={create.data.url} onSuccess={() => {}} />
+          <StudioUploader endpoint={create.data.url} onSuccess={onSuccess} />
         ) : (
           <Loader2Icon className="animate-spin" />
         )}
