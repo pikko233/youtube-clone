@@ -1,10 +1,16 @@
 import { relations } from "drizzle-orm";
 
+import { z } from "zod";
+import { zhCN } from "zod/locales";
+
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
+
+// 将 Zod 默认报错文案设为中文，全局生效
+z.config(zhCN());
 
 import {
   index,

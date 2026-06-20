@@ -4,7 +4,6 @@ import { ResponsiveModal } from "@/components/responsive-modal";
 import { UploadDropzone } from "@/lib/uploadthing";
 import { useTRPC } from "@/trpc/client";
 import { useQueryClient } from "@tanstack/react-query";
-import { file } from "zod";
 
 interface ThumbnailUploadModalProps {
   videoId: string;
