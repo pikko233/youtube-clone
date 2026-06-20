@@ -42,6 +42,7 @@ import {
   CopyIcon,
   Globe2Icon,
   ImagePlusIcon,
+  Loader2Icon,
   LockIcon,
   MoreVerticalIcon,
   RotateCcwIcon,
@@ -77,7 +78,11 @@ export const FormSection = ({ videoId }: FormSectionProps) => {
 };
 
 export const FormSkeletion = () => {
-  return <div>loading...</div>;
+  return (
+    <div className="h-screen flex justify-center items-center animate-spin">
+      <Loader2Icon className="size-10" />
+    </div>
+  );
 };
 
 export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
@@ -130,6 +135,45 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
         await queryClient.invalidateQueries(trpc.studio.getMany.queryFilter());
         await queryClient.invalidateQueries(trpc.studio.getOne.queryFilter());
         toast.success("封面重置成功");
+      },
+      onError: (error) => {
+        toast.error(error.message ?? "操作异常");
+      },
+    }),
+  );
+
+  const generateTitle = useMutation(
+    trpc.video.generateTitle.mutationOptions({
+      onSuccess: async () => {
+        toast.success("正在生成标题～", {
+          description: "可能需要等待一段时间",
+        });
+      },
+      onError: (error) => {
+        toast.error(error.message ?? "操作异常");
+      },
+    }),
+  );
+
+  const generateDescription = useMutation(
+    trpc.video.generateDescription.mutationOptions({
+      onSuccess: async () => {
+        toast.success("正在生成简介～", {
+          description: "可能需要等待一段时间",
+        });
+      },
+      onError: (error) => {
+        toast.error(error.message ?? "操作异常");
+      },
+    }),
+  );
+
+  const generateThumbnail = useMutation(
+    trpc.video.generateThumbnail.mutationOptions({
+      onSuccess: async () => {
+        toast.success("正在生成封面图片～", {
+          description: "可能需要等待一段时间",
+        });
       },
       onError: (error) => {
         toast.error(error.message ?? "操作异常");
@@ -200,7 +244,27 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>标题</FieldLabel>
+                    <FieldLabel>
+                      <div className="flex items-center gap-x-2">
+                        标题
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="rounded-full size-6 [&_svg]:size-3"
+                          onClick={() => generateTitle.mutate({ id: videoId })}
+                          disabled={
+                            generateTitle.isPending || !video.muxTrackId
+                          }
+                        >
+                          {generateTitle.isPending ? (
+                            <Loader2Icon className="animate-spin" />
+                          ) : (
+                            <SparkleIcon />
+                          )}
+                        </Button>
+                      </div>
+                    </FieldLabel>
                     <Input {...field} placeholder="为你的视频添加标题" />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -213,14 +277,36 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>描述</FieldLabel>
+                    <FieldLabel>
+                      <div className="flex items-center gap-x-2">
+                        简介
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="rounded-full size-6 [&_svg]:size-3"
+                          onClick={() =>
+                            generateDescription.mutate({ id: videoId })
+                          }
+                          disabled={
+                            generateDescription.isPending || !video.muxTrackId
+                          }
+                        >
+                          {generateDescription.isPending ? (
+                            <Loader2Icon className="animate-spin" />
+                          ) : (
+                            <SparkleIcon />
+                          )}
+                        </Button>
+                      </div>
+                    </FieldLabel>
                     <Textarea
                       {...field}
                       value={field.value ?? ""}
                       rows={10}
                       className="resize-none pr-10 min-h-60"
                       autoComplete="off"
-                      placeholder="为你的视频添加描述"
+                      placeholder="请输入视频简介..."
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />
@@ -246,7 +332,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                           <Button
                             type="button"
                             size="icon"
-                            className="bg-black/50 hover:bg-black/80 absolute top-1 right-1 rounded-full opacity-100 md:opacity-0 group-hover:opacity-100 duration-300 size-7"
+                            className="bg-black/50 hover:bg-black/50 absolute top-1 right-1 rounded-full opacity-100 md:opacity-0 group-hover:opacity-100 duration-300 size-7"
                           >
                             <MoreVerticalIcon className="text-white" />
                           </Button>
@@ -259,7 +345,11 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                               <ImagePlusIcon className="size-4 mr-1" />
                               选择图片
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() =>
+                                generateThumbnail.mutate({ id: videoId })
+                              }
+                            >
                               <SparkleIcon className="size-4 mr-1" />
                               AI生成
                             </DropdownMenuItem>
