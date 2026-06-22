@@ -1,0 +1,44 @@
+import Link from "next/link";
+import { VideoGetOneOutput } from "../../types";
+import { UserAvatar } from "@/components/user-avatar";
+import { useAuth } from "@clerk/nextjs";
+import { Button } from "@/components/ui/button";
+import { SubscriptionButton } from "@/modules/subscriptions/ui/components/subscription-button";
+import { UserInfo } from "@/modules/users/ui/components/user-info";
+
+interface VideoOwnerProps {
+  user: VideoGetOneOutput["user"];
+  videoId: string;
+}
+
+export const VideoOwner = ({ user, videoId }: VideoOwnerProps) => {
+  const { userId } = useAuth();
+
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <Link href={`/users/${user.id}`}>
+        <div className="flex items-center gap-3 min-w-0">
+          <UserAvatar size="lg" imageUrl={user.imageUrl} name={user.name} />
+          <div className="flex flex-col gap-1 min-w-0">
+            <UserInfo size="lg" name={user.name} />
+            <span className="text-sm text-muted-foreground">
+              {/* TODO: 粉丝数量 */}
+              {0} 粉丝
+            </span>
+          </div>
+        </div>
+      </Link>
+      {userId === user.clerkId ? (
+        <Button variant="secondary" className="rounded-full" asChild>
+          <Link href={`/studio/videos/${videoId}`}>编辑视频</Link>
+        </Button>
+      ) : (
+        <SubscriptionButton
+          onClick={() => {}}
+          isSubscriped={false}
+          disabled={false}
+        />
+      )}
+    </div>
+  );
+};

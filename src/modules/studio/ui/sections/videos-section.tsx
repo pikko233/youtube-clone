@@ -34,7 +34,7 @@ export const VideosSectionSkeleton = () => {
   return (
     <>
       <div className="border-y">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader>
             <TableRow>
               <TableHead className="pl-6 w-[510px]">视频</TableHead>
@@ -90,7 +90,7 @@ export const VideosSectionSuspense = () => {
   return (
     <div>
       <div className="border-y">
-        <Table>
+        <Table className="table-fixed">
           <TableHeader>
             <TableRow>
               <TableHead className="pl-6 w-[510px]">视频</TableHead>
@@ -121,11 +121,9 @@ export const VideosSectionSuspense = () => {
                           duration={video.duration}
                         />
                       </div>
-                      <div className="flex flex-col overflow-hidden gap-y-1">
-                        <span className="text-sm line-clamp-1">
-                          {video.title}
-                        </span>
-                        <span className="text-xs text-muted-foreground line-clamp-1">
+                      <div className="flex flex-col overflow-hidden gap-y-1 min-w-0">
+                        <span className="text-sm truncate">{video.title}</span>
+                        <span className="text-xs text-muted-foreground truncate">
                           {video.description || "No description"}
                         </span>
                       </div>

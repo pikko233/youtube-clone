@@ -136,14 +136,6 @@ const FormSectionSkeleton = () => {
   );
 };
 
-export const FormSkeletion = () => {
-  return (
-    <div className="h-screen flex justify-center items-center animate-spin">
-      <Loader2Icon className="size-10" />
-    </div>
-  );
-};
-
 export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
   const router = useRouter();
   const [thumbnailModelOpen, setThumbnailModalOpen] = useState(false);
@@ -229,19 +221,6 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     }),
   );
 
-  const generateThumbnail = useMutation(
-    trpc.video.generateThumbnail.mutationOptions({
-      onSuccess: async () => {
-        toast.success("正在生成封面图片～", {
-          description: "可能需要等待一段时间",
-        });
-      },
-      onError: (error) => {
-        toast.error(error.message ?? "操作异常");
-      },
-    }),
-  );
-
   const form = useForm<z.infer<typeof videoUpdateSchema>>({
     resolver: zodResolver(videoUpdateSchema),
     defaultValues: video,
@@ -282,7 +261,10 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
             <p className="text-xs text-muted-foreground">管理你的视频信息</p>
           </div>
           <div className="flex items-center gap-x-2">
-            <Button type="submit" disabled={update.isPending}>
+            <Button
+              type="submit"
+              disabled={update.isPending || !form.formState.isDirty}
+            >
               保存
             </Button>
             <DropdownMenu>
