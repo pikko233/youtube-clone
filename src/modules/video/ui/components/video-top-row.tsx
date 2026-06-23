@@ -13,15 +13,15 @@ interface VideoTopRowProps {
 
 export const VideoTopRow = ({ video }: VideoTopRowProps) => {
   const compactViews = useMemo(() => {
-    return Intl.NumberFormat("en", {
+    return Intl.NumberFormat("zh", {
       notation: "compact",
-    }).format(1245242);
-  }, []);
+    }).format(video.viewCount);
+  }, [video.viewCount]);
   const expandedViews = useMemo(() => {
-    return Intl.NumberFormat("en", {
+    return Intl.NumberFormat("zh", {
       notation: "standard",
-    }).format(1245242);
-  }, []);
+    }).format(video.viewCount);
+  }, [video.viewCount]);
   const compactDate = useMemo(() => {
     return formatDistanceToNow(video.createdAt, {
       addSuffix: true,

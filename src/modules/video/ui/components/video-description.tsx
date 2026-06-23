@@ -26,7 +26,7 @@ export const VideoDescription = ({
     >
       <div className="flex gap-2 text-sm mb-2">
         <span className="font-medium">
-          {isExpanded ? expandedViews : compactViews} 阅读量
+          {isExpanded ? expandedViews : compactViews} 观看次数
         </span>
         <span className="font-medium">
           {isExpanded ? expandedDate : compactDate}
