@@ -40,7 +40,15 @@ export const VideoTopRow = ({ video }: VideoTopRowProps) => {
         <VideoOwner user={video.user} videoId={video.id} />
         {/* 点赞/收藏 */}
         <div className="flex items-center overflow-x-auto sm:min-w-[calc(50% - 6px)] sm:justify-end sm:overflow-visible pb-2 -mb-2 sm:pb-0 sm:mb-0 gap-2">
-          <VideoReactions />
+          {/* 点赞 */}
+          <VideoReactions
+            videoId={video.id}
+            likes={video.likeCount}
+            dislikes={video.dislikeCount}
+            viewerReaction={video.viewerReaction}
+          />
+
+          {/* 添加至播放列表 */}
           <VideoMenu videoId={video.id} variant="secondary" />
         </div>
       </div>
