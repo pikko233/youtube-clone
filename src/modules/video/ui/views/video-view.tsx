@@ -20,7 +20,7 @@ export const VideoView = ({ videoId }: VideoViewProps) => {
           </div>
 
           {/* 评论区 */}
-          <CommentsSection />
+          <CommentsSection videoId={videoId} />
         </div>
 
         {/* PC端 推荐视频区域 */}

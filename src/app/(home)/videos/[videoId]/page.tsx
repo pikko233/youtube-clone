@@ -15,6 +15,10 @@ const Page = async ({ params }: PageProps) => {
   void queryClient.prefetchQuery(
     trpc.video.getOne.queryOptions({ id: videoId }),
   );
+  // TODO：记得改成分页查询
+  void queryClient.prefetchQuery(
+    trpc.comments.getMany.queryOptions({ videoId }),
+  );
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
