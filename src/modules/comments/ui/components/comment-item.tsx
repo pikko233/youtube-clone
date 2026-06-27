@@ -13,9 +13,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MessageSquareIcon, MoreVerticalIcon, Trash2Icon } from "lucide-react";
+import {
+  MessageSquareIcon,
+  MoreVerticalIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface CommentItemProps {
   comment: CommentsGetManyOutput["items"][number];
@@ -26,10 +33,50 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
   const clerk = useClerk();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  // 删除评论
   const remove = useMutation(
     trpc.comments.remove.mutationOptions({
       onSuccess: () => {
         toast.success("删除成功");
+        queryClient.invalidateQueries(
+          trpc.comments.getMany.infiniteQueryFilter({
+            videoId: comment.videoId,
+          }),
+        );
+      },
+      onError: (error) => {
+        if (error.data?.code === "UNAUTHORIZED") {
+          toast.info("请先登录");
+          clerk.openSignIn();
+        }
+      },
+    }),
+  );
+
+  // 点赞评论
+  const like = useMutation(
+    trpc.commentReactions.like.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries(
+          trpc.comments.getMany.infiniteQueryFilter({
+            videoId: comment.videoId,
+          }),
+        );
+      },
+      onError: (error) => {
+        if (error.data?.code === "UNAUTHORIZED") {
+          toast.info("请先登录");
+          clerk.openSignIn();
+        }
+      },
+    }),
+  );
+
+  // 点踩评论
+  const dislike = useMutation(
+    trpc.commentReactions.dislike.mutationOptions({
+      onSuccess: () => {
         queryClient.invalidateQueries(
           trpc.comments.getMany.infiniteQueryFilter({
             videoId: comment.videoId,
@@ -74,6 +121,43 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
           </Link>
           {/* 评论内容 */}
           <p className="text-sm">{comment.value}</p>
+          {/* 回复评论 */}
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center">
+              <Button
+                disabled={like.isPending || dislike.isPending}
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                onClick={() => like.mutate({ commentId: comment.id })}
+              >
+                <ThumbsUpIcon
+                  className={cn(
+                    comment.viewerReaction == "like" && "fill-black",
+                  )}
+                />
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {comment.likeCount}
+              </span>
+              <Button
+                disabled={like.isPending || dislike.isPending}
+                variant="ghost"
+                size="icon"
+                className="size-8"
+                onClick={() => dislike.mutate({ commentId: comment.id })}
+              >
+                <ThumbsDownIcon
+                  className={cn(
+                    comment.viewerReaction == "dislike" && "fill-black",
+                  )}
+                />
+              </Button>
+              <span className="text-xs text-muted-foreground">
+                {comment.dislikeCount}
+              </span>
+            </div>
+          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
