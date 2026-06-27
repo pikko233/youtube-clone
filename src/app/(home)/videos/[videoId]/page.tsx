@@ -1,4 +1,5 @@
 import { VideoView } from "@/modules/video/ui/views/video-view";
+import { DEFAULT_LIMIT } from "@/trpc/constants";
 import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
@@ -15,9 +16,16 @@ const Page = async ({ params }: PageProps) => {
   void queryClient.prefetchQuery(
     trpc.video.getOne.queryOptions({ id: videoId }),
   );
-  // TODO：记得改成分页查询
-  void queryClient.prefetchQuery(
-    trpc.comments.getMany.queryOptions({ videoId }),
+  void queryClient.prefetchInfiniteQuery(
+    trpc.comments.getMany.infiniteQueryOptions(
+      {
+        videoId,
+        limit: DEFAULT_LIMIT,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    ),
   );
 
   return (

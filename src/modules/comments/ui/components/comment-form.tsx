@@ -38,7 +38,7 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
         toast.success("评论发送成功～");
         form.reset();
         void queryClient.invalidateQueries(
-          trpc.comments.getMany.queryFilter({ videoId }),
+          trpc.comments.getMany.infiniteQueryFilter({ videoId }),
         );
       },
       onError: (error) => {
@@ -62,6 +62,13 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
     create.mutate(value);
   };
 
+  const handleTextareaKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // 阻止textarea默认换行行为
+      form.handleSubmit(handleSubmit)();
+    }
+  };
+
   return (
     <form
       className="flex gap-4 group mt-6"
@@ -83,6 +90,7 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
                   {...field}
                   placeholder="添加一条评论..."
                   className="resize-none bg-transparent overflow-hidden h-10 max-h-10"
+                  onKeyDown={(e) => handleTextareaKeyDown(e)}
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
