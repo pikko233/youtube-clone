@@ -1,3 +1,5 @@
+"use client";
+
 import { UserAvatar } from "@/components/user-avatar";
 import { CommentsGetManyOutput } from "../../types";
 import Link from "next/link";
@@ -14,6 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import {
+  ChevronDownIcon,
+  ChevronUpIcon,
   MessageSquareIcon,
   MoreVerticalIcon,
   ThumbsDownIcon,
@@ -23,16 +27,26 @@ import {
 import { useAuth, useClerk } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { CommentForm } from "./comment-form";
+import { CommentReplies } from "./comment-replies";
 
 interface CommentItemProps {
   comment: CommentsGetManyOutput["items"][number];
+  variant?: "reply" | "comment";
 }
 
-export const CommentItem = ({ comment }: CommentItemProps) => {
+export const CommentItem = ({
+  comment,
+  variant = "comment",
+}: CommentItemProps) => {
   const { userId } = useAuth();
   const clerk = useClerk();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
+
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const [isRepliesOpen, setIsRepliesOpen] = useState(false);
 
   // 删除评论
   const remove = useMutation(
@@ -98,7 +112,7 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
         {/* 用户头像 */}
         <Link href={`/users/${comment.userId}`}>
           <UserAvatar
-            size="lg"
+            size={variant === "comment" ? "lg" : "sm"}
             imageUrl={comment.user.imageUrl}
             name={comment.user.name}
           />
@@ -121,8 +135,9 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
           </Link>
           {/* 评论内容 */}
           <p className="text-sm">{comment.value}</p>
-          {/* 回复评论 */}
+          {/* 更多 */}
           <div className="flex items-center gap-2 mt-1">
+            {/* 点赞/点踩/回复 */}
             <div className="flex items-center">
               <Button
                 disabled={like.isPending || dislike.isPending}
@@ -157,32 +172,76 @@ export const CommentItem = ({ comment }: CommentItemProps) => {
                 {comment.dislikeCount}
               </span>
             </div>
+            {variant === "comment" && (
+              <Button
+                variant="ghost"
+                size="lg"
+                className="h-8"
+                onClick={() => setIsReplyOpen((current) => !current)}
+              >
+                回复
+              </Button>
+            )}
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="size-8">
-              <MoreVerticalIcon />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => {}}>
-                <MessageSquareIcon className="mr-1" />
-                回复
-              </DropdownMenuItem>
-              {comment.user.clerkId === userId && (
-                <DropdownMenuItem
-                  onClick={() => remove.mutate({ id: comment.id })}
-                >
-                  <Trash2Icon className="mr-1" />
-                  删除
+        {(userId === comment.user.clerkId || variant === "comment") && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="size-8">
+                <MoreVerticalIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuGroup>
+                <DropdownMenuItem onClick={() => setIsReplyOpen(true)}>
+                  <MessageSquareIcon className="mr-1" />
+                  回复
                 </DropdownMenuItem>
-              )}
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+                {comment.user.clerkId === userId && (
+                  <DropdownMenuItem
+                    onClick={() => remove.mutate({ id: comment.id })}
+                  >
+                    <Trash2Icon className="mr-1" />
+                    删除
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
+      {/* 回复评论的表单 */}
+      {isReplyOpen && variant === "comment" && (
+        <div className="mt-4 pl-14">
+          <CommentForm
+            videoId={comment.videoId}
+            parentId={comment.id}
+            onSuccess={() => {
+              setIsReplyOpen(false);
+              setIsRepliesOpen(true);
+            }}
+            onCancel={() => setIsReplyOpen(false)}
+            variant="reply"
+          />
+        </div>
+      )}
+      {/* 该评论的回复数量 */}
+      {comment.replyCount > 0 && variant === "comment" && (
+        <div className="pl-14">
+          <Button
+            variant="tertiary"
+            size="sm"
+            onClick={() => setIsRepliesOpen((current) => !current)}
+          >
+            {isRepliesOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            {comment.replyCount} 条回复
+          </Button>
+        </div>
+      )}
+      {/* 回复评论展示列表组件 */}
+      {comment.replyCount > 0 && variant === "comment" && isRepliesOpen && (
+        <CommentReplies parentId={comment.id} videoId={comment.videoId} />
+      )}
     </div>
   );
 };

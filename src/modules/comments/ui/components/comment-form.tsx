@@ -24,10 +24,19 @@ type FormValues = z.infer<typeof formSchema>;
 
 interface CommentFormProps {
   videoId: string;
+  parentId?: string;
   onSuccess?: () => void;
+  onCancel?: () => void;
+  variant?: "reply" | "comment";
 }
 
-export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
+export const CommentForm = ({
+  videoId,
+  parentId,
+  onSuccess,
+  onCancel,
+  variant = "comment",
+}: CommentFormProps) => {
   const { user } = useUser();
   const clerk = useClerk();
   const trpc = useTRPC();
@@ -37,14 +46,20 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
       onSuccess: () => {
         toast.success("评论发送成功～");
         form.reset();
+        onSuccess?.();
         void queryClient.invalidateQueries(
           trpc.comments.getMany.infiniteQueryFilter({ videoId }),
+        );
+        void queryClient.invalidateQueries(
+          trpc.comments.getMany.infiniteQueryFilter({ videoId, parentId }),
         );
       },
       onError: (error) => {
         if (error.data?.code === "UNAUTHORIZED") {
           toast.info("请先登录");
           clerk.openSignIn();
+        } else {
+          toast.info(error.message || "操作失败，请稍后再试～");
         }
       },
     }),
@@ -53,6 +68,7 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      parentId,
       videoId,
       value: "",
     },
@@ -67,6 +83,11 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
       e.preventDefault(); // 阻止textarea默认换行行为
       form.handleSubmit(handleSubmit)();
     }
+  };
+
+  const handleCancel = () => {
+    form.reset();
+    onCancel?.();
   };
 
   return (
@@ -88,7 +109,11 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
               <Field data-invalid={fieldState.invalid}>
                 <Textarea
                   {...field}
-                  placeholder="添加一条评论..."
+                  placeholder={
+                    variant === "comment"
+                      ? "添加一条评论..."
+                      : "回复这条评论..."
+                  }
                   className="resize-none bg-transparent overflow-hidden h-10 max-h-10"
                   onKeyDown={(e) => handleTextareaKeyDown(e)}
                 />
@@ -99,9 +124,20 @@ export const CommentForm = ({ videoId, onSuccess }: CommentFormProps) => {
             )}
           />
         </div>
-        <div className="flex justify-end mt-2">
+        <div className="flex justify-end mt-2 gap-2">
+          {variant === "reply" && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="lg"
+              onClick={handleCancel}
+              disabled={create.isPending}
+            >
+              取消
+            </Button>
+          )}
           <Button type="submit" size="lg" disabled={create.isPending}>
-            发送
+            {variant === "comment" ? "评论" : "回复"}
           </Button>
         </div>
       </div>
