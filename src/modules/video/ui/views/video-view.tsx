@@ -16,7 +16,7 @@ export const VideoView = ({ videoId }: VideoViewProps) => {
 
           {/* 移动设备-手机端 推荐视频区域 */}
           <div className="xl:hidden block mb-4">
-            <SuggestionsSection />
+            <SuggestionsSection videoId={videoId} isManual />
           </div>
 
           {/* 评论区 */}
@@ -25,7 +25,7 @@ export const VideoView = ({ videoId }: VideoViewProps) => {
 
         {/* PC端 推荐视频区域 */}
         <div className="hidden xl:block w-full xl:w-[380px] 2xl:w-[460px] shrink-1">
-          <SuggestionsSection />
+          <SuggestionsSection videoId={videoId} />
         </div>
       </div>
     </div>

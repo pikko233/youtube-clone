@@ -47,6 +47,7 @@ import {
   MoreVerticalIcon,
   RotateCcwIcon,
   SparkleIcon,
+  SparklesIcon,
   Trash2Icon,
 } from "lucide-react";
 import { videoUpdateSchema } from "@/db/schema";
@@ -308,7 +309,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                           {generateTitle.isPending ? (
                             <Loader2Icon className="animate-spin" />
                           ) : (
-                            <SparkleIcon />
+                            <SparklesIcon />
                           )}
                         </Button>
                       </div>
@@ -343,7 +344,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                           {generateDescription.isPending ? (
                             <Loader2Icon className="animate-spin" />
                           ) : (
-                            <SparkleIcon />
+                            <SparklesIcon />
                           )}
                         </Button>
                       </div>
@@ -398,7 +399,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                                 setThumbnailGenerateModalOpen(true)
                               }
                             >
-                              <SparkleIcon className="size-4 mr-1" />
+                              <SparklesIcon className="size-4 mr-1" />
                               AI生成
                             </DropdownMenuItem>
                             <DropdownMenuItem

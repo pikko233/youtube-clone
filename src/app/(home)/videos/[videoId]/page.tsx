@@ -13,11 +13,25 @@ const Page = async ({ params }: PageProps) => {
   const { videoId } = await params;
 
   const queryClient = getQueryClient();
+  // 获取视频详情
   void queryClient.prefetchQuery(
     trpc.video.getOne.queryOptions({ id: videoId }),
   );
+  // 获取评论列表
   void queryClient.prefetchInfiniteQuery(
     trpc.comments.getMany.infiniteQueryOptions(
+      {
+        videoId,
+        limit: DEFAULT_LIMIT,
+      },
+      {
+        getNextPageParam: (lastPage) => lastPage.nextCursor,
+      },
+    ),
+  );
+  // 获取推荐视频列表
+  void queryClient.prefetchInfiniteQuery(
+    trpc.suggestions.getMany.infiniteQueryOptions(
       {
         videoId,
         limit: DEFAULT_LIMIT,
