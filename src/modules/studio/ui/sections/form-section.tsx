@@ -65,6 +65,7 @@ import { THUMBNAIL_FALLBACK } from "@/modules/video/constants";
 import { ThumbnailUploadModal } from "../components/thumbnail-upload-model";
 import { ThumbnailGenerateModal } from "../components/thumbnail-generate-modal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { APP_URL } from "@/constants";
 
 interface FormSectionProps {
   videoId: string;
@@ -174,8 +175,22 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
       onSuccess: async () => {
         await queryClient.invalidateQueries(trpc.studio.getMany.queryFilter());
         toast.success("删除成功");
-        router.refresh(); // 清掉nextjs的路由缓存，不然返回上一页数据不会更新
         router.push("/studio");
+      },
+      onError: (error) => {
+        toast.error(error.message ?? "操作异常");
+      },
+    }),
+  );
+
+  const revalidate = useMutation(
+    trpc.video.revalidate.mutationOptions({
+      onSuccess: async () => {
+        void queryClient.invalidateQueries(trpc.studio.getMany.queryFilter());
+        void queryClient.invalidateQueries(
+          trpc.studio.getOne.queryFilter({ id: videoId }),
+        );
+        toast.success("已更新视频状态");
       },
       onError: (error) => {
         toast.error(error.message ?? "操作异常");
@@ -231,7 +246,7 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
     update.mutate(data);
   };
 
-  const fullUrl = `${process.env.VERCEL_URL || "http://localhost:3000"}/videos/${videoId}`;
+  const fullUrl = `${APP_URL || "http://localhost:3000"}/videos/${videoId}`;
   const [isCopied, setIsCopied] = useState(false);
 
   const onCopy = async () => {
@@ -280,6 +295,12 @@ export const FormSectionSuspense = ({ videoId }: FormSectionProps) => {
                 >
                   <Trash2Icon className="size-4 mr-2" />
                   <span>删除</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => revalidate.mutate({ id: videoId })}
+                >
+                  <RotateCcwIcon className="size-4 mr-2" />
+                  <span>更新视频状态</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

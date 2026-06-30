@@ -4,7 +4,7 @@ import { InfiniteScroll } from "@/components/infinite-scroll";
 import { CommentForm } from "@/modules/comments/ui/components/comment-form";
 import { CommentItem } from "@/modules/comments/ui/components/comment-item";
 import { useTRPC } from "@/trpc/client";
-import { DEFAULT_LIMIT } from "@/trpc/constants";
+import { DEFAULT_LIMIT } from "@/constants";
 import {
   useSuspenseInfiniteQuery,
   useSuspenseQuery,

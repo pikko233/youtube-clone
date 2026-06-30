@@ -82,7 +82,7 @@ export const VideoReactions = ({
         disabled={like.isPending || dislike.isPending}
       >
         <ThumbsDownIcon
-          className={cn("size-5", viewerReaction !== "like" && "fill-black")}
+          className={cn("size-5", viewerReaction === "dislike" && "fill-black")}
         />
         {dislikes}
       </Button>

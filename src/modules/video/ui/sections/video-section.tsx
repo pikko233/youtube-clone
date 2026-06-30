@@ -72,7 +72,7 @@ export const VideoSectionSuspense = ({ videoId }: VideoSectionProps) => {
         )}
       >
         <VideoPlayer
-          autoPlay={false}
+          autoPlay={true}
           onPlay={handlePlay}
           playbackId={video.muxPlaybackId}
           thumbnailUrl={video.thumbnailUrl}

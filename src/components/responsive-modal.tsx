@@ -1,11 +1,24 @@
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "./ui/drawer";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerHeader,
+  DrawerTitle,
+} from "./ui/drawer";
 
 interface ResponsiveModalProps {
   children: React.ReactNode;
   open: boolean;
   title: string;
+  description?: string;
   onOpenChange: (open: boolean) => void;
 }
 
@@ -13,6 +26,7 @@ export const ResponsiveModal = ({
   children,
   open,
   title,
+  description,
   onOpenChange,
 }: ResponsiveModalProps) => {
   const isMobile = useIsMobile();
@@ -23,6 +37,7 @@ export const ResponsiveModal = ({
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{title}</DrawerTitle>
+            {description && <DrawerDescription>{description}</DrawerDescription>}
           </DrawerHeader>
           {children}
         </DrawerContent>
@@ -32,9 +47,10 @@ export const ResponsiveModal = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
+          {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
         {children}
       </DialogContent>

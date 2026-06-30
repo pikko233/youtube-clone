@@ -1,5 +1,5 @@
 import { StudioView } from "@/modules/studio/ui/views/studio-view";
-import { DEFAULT_LIMIT } from "@/trpc/constants";
+import { DEFAULT_LIMIT } from "@/constants";
 import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 

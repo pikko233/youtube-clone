@@ -1,5 +1,5 @@
 import { useTRPC } from "@/trpc/client";
-import { DEFAULT_LIMIT } from "@/trpc/constants";
+import { DEFAULT_LIMIT } from "@/constants";
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { CommentItem } from "./comment-item";

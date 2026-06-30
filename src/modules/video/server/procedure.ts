@@ -99,6 +99,7 @@ export const videoRouter = createTRPCRouter({
 
       return existingVideo;
     }),
+  // ai生成视频简介
   generateDescription: protectedProcedure
     .input(z.object({ id: z.uuid() }))
     .mutation(async ({ ctx, input }) => {
@@ -111,6 +112,7 @@ export const videoRouter = createTRPCRouter({
 
       return { workflowRunId };
     }),
+  // ai生成视频标题
   generateTitle: protectedProcedure
     .input(z.object({ id: z.uuid() }))
     .mutation(async ({ ctx, input }) => {
@@ -123,6 +125,7 @@ export const videoRouter = createTRPCRouter({
 
       return { workflowRunId };
     }),
+  // ai生成视频封面图
   generateThumbnail: protectedProcedure
     .input(z.object({ id: z.uuid(), prompt: z.string().min(10) }))
     .mutation(async ({ ctx, input }) => {
@@ -135,6 +138,56 @@ export const videoRouter = createTRPCRouter({
 
       return { workflowRunId };
     }),
+  // 验证视频上传状态
+  revalidate: protectedProcedure
+    .input(z.object({ id: z.uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { id: userId } = ctx.user;
+
+      const [existingVideo] = await db
+        .select()
+        .from(videos)
+        .where(and(eq(videos.id, input.id), eq(videos.userId, userId)));
+
+      if (!existingVideo) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (!existingVideo.muxUploadId) {
+        // 没有上传视频
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+
+      const upload = await mux.video.uploads.retrieve(
+        existingVideo.muxUploadId,
+      );
+
+      if (!upload || !upload.asset_id) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+
+      const asset = await mux.video.assets.retrieve(upload.asset_id);
+
+      if (!asset) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
+
+      const duration = asset.duration ? Math.round(asset.duration * 1000) : 0;
+
+      const [updatedVideo] = await db
+        .update(videos)
+        .set({
+          muxStatus: asset.status,
+          muxPlaybackId: asset.playback_ids?.[0].id,
+          muxAssetId: asset.id,
+          duration,
+        })
+        .where(and(eq(videos.id, input.id), eq(videos.userId, userId)))
+        .returning();
+
+      return updatedVideo;
+    }),
+  // 重置视频封面(撤销修改，回到原来的封面)
   restoreThumbnail: protectedProcedure
     .input(
       z.object({

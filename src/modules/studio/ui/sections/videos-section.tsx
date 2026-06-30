@@ -2,7 +2,7 @@
 
 import { InfiniteScroll } from "@/components/infinite-scroll";
 import { useTRPC } from "@/trpc/client";
-import { DEFAULT_LIMIT } from "@/trpc/constants";
+import { DEFAULT_LIMIT } from "@/constants";
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
@@ -19,6 +19,8 @@ import { VideoThumbnail } from "@/modules/video/ui/components/video-thumbnail";
 import { Globe2Icon, LockIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMuxStatusLabel, getVisibilityLabel } from "@/lib/utils";
+import { format } from "date-fns";
+import { zhCN } from "date-fns/locale";
 
 export const VideosSection = () => {
   return (
@@ -141,7 +143,9 @@ export const VideosSectionSuspense = () => {
                   </TableCell>
                   <TableCell>{getMuxStatusLabel(video.muxStatus)}</TableCell>
                   <TableCell className="text-sm truncate">
-                    {new Date(video.createdAt).toLocaleDateString()}
+                    {format(new Date(video.createdAt), "yyyy/M/d", {
+                      locale: zhCN,
+                    })}
                   </TableCell>
                   <TableCell>播放量</TableCell>
                   <TableCell>评论数</TableCell>

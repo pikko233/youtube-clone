@@ -1,5 +1,5 @@
 import { VideoView } from "@/modules/video/ui/views/video-view";
-import { DEFAULT_LIMIT } from "@/trpc/constants";
+import { DEFAULT_LIMIT } from "@/constants";
 import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
