@@ -17,8 +17,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 const videoRowCardVariants = cva("group flex min-w-0 hover:pointer", {
   variants: {
     size: {
-      default: "",
-      compact: "",
+      default: "gap-4",
+      compact: "gap-2",
     },
   },
   defaultVariants: {
@@ -44,7 +44,7 @@ interface VideoRowCardProps extends VariantProps<typeof videoRowCardVariants> {
 }
 
 export const VideoRowCardSkeleton = ({
-  size,
+  size = "default",
 }: VariantProps<typeof videoRowCardVariants>) => {
   return (
     <div className={videoRowCardVariants({ size })}>
@@ -113,13 +113,7 @@ export const VideoRowCard = ({
       {/* 视频信息 */}
       <div className="flex-1 min-w-0 min-h-full">
         <div className="flex justify-between gap-2 h-full">
-          <Link
-            href={`/videos/${data.id}`}
-            className={cn(
-              "flex-1 min-w-0 h-full",
-              size == "default" ? "pl-4" : "pl-2",
-            )}
-          >
+          <Link href={`/videos/${data.id}`} className="flex-1 min-w-0 h-full">
             {/* 视频标题 */}
             <h3
               className={cn(

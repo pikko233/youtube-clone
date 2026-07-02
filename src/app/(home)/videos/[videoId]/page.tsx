@@ -3,6 +3,8 @@ import { DEFAULT_LIMIT } from "@/constants";
 import { getQueryClient, trpc } from "@/trpc/server";
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
+export const dynamic = "force-dynamic";
+
 interface PageProps {
   params: Promise<{
     videoId: string;
