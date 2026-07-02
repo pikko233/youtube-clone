@@ -19,7 +19,7 @@ const items = [
   },
   {
     title: "订阅",
-    url: "/feed/subscriptions",
+    url: "/feed/subscribed",
     icon: PlaySquareIcon,
     auth: true,
   },
