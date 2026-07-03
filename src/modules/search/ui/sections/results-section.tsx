@@ -38,23 +38,18 @@ export const ResultsSection = (props: ResultsSectionProps) => {
 };
 
 export const ResultsSectionSkeleton = () => {
-  const isMobile = useIsMobile();
-
   return (
     <>
-      {isMobile ? (
-        <div className="flex flex-col gap-4 gap-y-10">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <VideoGridCardSkeleton key={index} />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-4 gap-y-10">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <VideoRowCardSkeleton key={index} />
-          ))}
-        </div>
-      )}
+      <div className="flex flex-col gap-4 gap-y-10 md:hidden">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <VideoGridCardSkeleton key={index} />
+        ))}
+      </div>
+      <div className="hidden md:flex flex-col gap-4 gap-y-10">
+        {Array.from({ length: 5 }).map((_, index) => (
+          <VideoRowCardSkeleton key={index} />
+        ))}
+      </div>
     </>
   );
 };

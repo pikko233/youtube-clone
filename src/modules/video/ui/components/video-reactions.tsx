@@ -40,6 +40,9 @@ export const VideoReactions = ({
         queryClient.invalidateQueries(
           trpc.video.getOne.queryFilter({ id: videoId }),
         );
+        queryClient.invalidateQueries(
+          trpc.playlists.getLiked.infiniteQueryFilter(),
+        );
       },
     }),
   );
@@ -56,6 +59,9 @@ export const VideoReactions = ({
       onSuccess: () => {
         queryClient.invalidateQueries(
           trpc.video.getOne.queryFilter({ id: videoId }),
+        );
+        queryClient.invalidateQueries(
+          trpc.playlists.getLiked.infiniteQueryFilter(),
         );
       },
     }),

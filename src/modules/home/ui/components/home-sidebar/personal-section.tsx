@@ -9,15 +9,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth, useClerk } from "@clerk/nextjs";
-import {
-  FlameIcon,
-  HistoryIcon,
-  HomeIcon,
-  ListVideoIcon,
-  PlaySquareIcon,
-  ThumbsUpIcon,
-} from "lucide-react";
+import { HistoryIcon, ListVideoIcon, ThumbsUpIcon } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const items = [
   {
@@ -43,6 +37,8 @@ const items = [
 export const PersonalSection = () => {
   const clerk = useClerk();
   const { isSignedIn } = useAuth();
+  const pathname = usePathname();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>我的</SidebarGroupLabel>
@@ -52,7 +48,7 @@ export const PersonalSection = () => {
             <SidebarMenuItem key={item.title}>
               <SidebarMenuButton
                 asChild
-                isActive={false} // TODO: active menuItem
+                isActive={pathname === item.url}
                 onClick={(e) => {
                   if (!isSignedIn && item.auth) {
                     e.preventDefault();
