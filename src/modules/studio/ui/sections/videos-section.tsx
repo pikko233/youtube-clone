@@ -147,9 +147,9 @@ export const VideosSectionSuspense = () => {
                       locale: zhCN,
                     })}
                   </TableCell>
-                  <TableCell>播放量</TableCell>
-                  <TableCell>评论数</TableCell>
-                  <TableCell>点赞量</TableCell>
+                  <TableCell>{video.viewCount}</TableCell>
+                  <TableCell>{video.commentCount}</TableCell>
+                  <TableCell>{video.likeCount}</TableCell>
                 </TableRow>
               ))}
           </TableBody>

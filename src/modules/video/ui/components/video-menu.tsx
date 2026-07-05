@@ -61,10 +61,12 @@ export const VideoMenu = ({
               <ListPlusIcon className="mr-2 size-4" />
               添加至播放列表
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => {}}>
-              <Trash2Icon className="mr-2 size-4" />
-              移除
-            </DropdownMenuItem>
+            {onRemove && (
+              <DropdownMenuItem onClick={onRemove}>
+                <Trash2Icon className="mr-2 size-4" />
+                移除
+              </DropdownMenuItem>
+            )}
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>

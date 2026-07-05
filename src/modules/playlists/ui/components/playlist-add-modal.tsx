@@ -62,13 +62,19 @@ export const PlaylistAddModal = ({
 
   const addVideo = useMutation(
     trpc.playlists.addVideo.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast.success("添加成功");
         void queryClient.invalidateQueries(
           trpc.playlists.getMany.infiniteQueryFilter(),
         );
         void queryClient.invalidateQueries(
           trpc.playlists.getManyForVideo.infiniteQueryFilter({ videoId }),
+        );
+        void queryClient.invalidateQueries(
+          trpc.playlists.getOne.queryFilter({ id: data.playlistId }),
+        );
+        void queryClient.invalidateQueries(
+          trpc.playlists.getVideos.queryFilter({ playlistId: data.playlistId }),
         );
       },
       onError: (error) => {
