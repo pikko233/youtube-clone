@@ -27,7 +27,7 @@ export const InfiniteScroll = ({
   }, [isIntersecting, hasNextPage, isFetching, isManual, fetchNextPage]);
 
   return (
-    <div className="flex justify-center p-4">
+    <div className="flex justify-center py-10">
       <div ref={targetRef} className="h-1" />
       {hasNextPage ? (
         <Button

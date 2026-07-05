@@ -1,16 +1,12 @@
 import { relations } from "drizzle-orm";
 
-import { z } from "zod";
-import { zhCN } from "zod/locales";
+import "@/lib/zod-config";
 
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
-
-// 将 Zod 默认报错文案设为中文，全局生效
-z.config(zhCN());
 
 import {
   index,
@@ -26,6 +22,63 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const reactionType = pgEnum("reaction_type", ["like", "dislike"]);
+
+export const playlistVideos = pgTable(
+  "playlist_videos",
+  {
+    playlistId: uuid("playlist_id")
+      .references(() => playlists.id, { onDelete: "cascade" })
+      .notNull(),
+    videoId: uuid("video_id")
+      .references(() => videos.id, { onDelete: "cascade" })
+      .notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    primaryKey({
+      name: "playlist_videos_pk",
+      columns: [t.playlistId, t.videoId],
+    }),
+  ],
+);
+
+// 记录播放列表与视频的关系（每个播放列表里面有哪些视频）
+export const playlistVideoRelations = relations(playlistVideos, ({ one }) => ({
+  playlist: one(playlists, {
+    fields: [playlistVideos.playlistId],
+    references: [playlists.id],
+  }),
+  video: one(videos, {
+    fields: [playlistVideos.videoId],
+    references: [videos.id],
+  }),
+}));
+
+export const playlists = pgTable("playlists", {
+  id: uuid("id").primaryKey().defaultRandom().notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => new Date()),
+});
+
+export const playlistRelations = relations(playlists, ({ one, many }) => ({
+  // 一个播放列表对应一个用户
+  user: one(users, {
+    fields: [playlists.userId],
+    references: [users.id],
+  }),
+  // 一个播放列表有多个视频
+  playlistVideos: many(playlistVideos),
+}));
 
 export const users = pgTable(
   "users",
@@ -55,6 +108,7 @@ export const userRelations = relations(users, ({ many }) => ({
   }),
   comments: many(comments),
   commentReactions: many(commentReactions),
+  playlists: many(playlists),
 }));
 
 export const subscriptions = pgTable(
@@ -168,6 +222,7 @@ export const videoRelations = relations(videos, ({ one, many }) => ({
   views: many(videoViews),
   reactions: many(videoReactions),
   comments: many(comments),
+  playlistVideos: many(playlistVideos),
 }));
 
 export const comments = pgTable(

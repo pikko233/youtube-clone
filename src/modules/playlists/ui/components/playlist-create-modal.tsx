@@ -8,50 +8,46 @@ import z from "zod";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Field,
   FieldLabel,
   FieldGroup,
-  FieldDescription,
   FieldError,
 } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-interface ThumbnailGenerateModalProps {
-  videoId: string;
+interface PlaylistCreateModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 const formSchema = z.object({
-  prompt: z.string().min(10),
+  name: z.string().min(1),
 });
 
-export const ThumbnailGenerateModal = ({
-  videoId,
+export const PlaylistCreateModal = ({
   open,
   onOpenChange,
-}: ThumbnailGenerateModalProps) => {
+}: PlaylistCreateModalProps) => {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      prompt: "",
+      name: "",
     },
   });
 
-  const generateThumbnail = useMutation(
-    trpc.video.generateThumbnail.mutationOptions({
+  const create = useMutation(
+    trpc.playlists.create.mutationOptions({
       onSuccess: async () => {
-        toast.success("正在生成封面图片～", {
-          description: "可能需要等待一段时间",
-        });
         form.reset();
         onOpenChange(false);
-        await queryClient.invalidateQueries(trpc.studio.getOne.queryFilter());
-        await queryClient.invalidateQueries(trpc.studio.getMany.queryFilter());
+        toast.success("列表创建成功~");
+        queryClient.invalidateQueries(
+          trpc.playlists.getMany.infiniteQueryFilter(),
+        );
       },
       onError: (error) => {
         toast.error(error.message ?? "操作异常");
@@ -60,14 +56,13 @@ export const ThumbnailGenerateModal = ({
   );
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    generateThumbnail.mutate({
-      prompt: values.prompt,
-      id: videoId,
+    create.mutate({
+      name: values.name,
     });
   };
   return (
     <ResponsiveModal
-      title="使用AI生成封面"
+      title="创建播放列表"
       open={open}
       onOpenChange={onOpenChange}
     >
@@ -77,18 +72,12 @@ export const ThumbnailGenerateModal = ({
       >
         <FieldGroup>
           <Controller
-            name="prompt"
+            name="name"
             control={form.control}
             render={({ field, fieldState }) => (
               <Field>
-                <FieldLabel>提示词</FieldLabel>
-                <Textarea
-                  {...field}
-                  className="resize-none"
-                  cols={30}
-                  rows={5}
-                  placeholder="请描述你想要的封面图"
-                />
+                <FieldLabel>播放列表名称</FieldLabel>
+                <Input {...field} placeholder="请输入播放列表名称" />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
@@ -97,8 +86,8 @@ export const ThumbnailGenerateModal = ({
           />
         </FieldGroup>
         <div className="flex justify-end">
-          <Button type="submit" disabled={generateThumbnail.isPending}>
-            生成
+          <Button type="submit" disabled={create.isPending}>
+            创建
           </Button>
         </div>
       </form>
