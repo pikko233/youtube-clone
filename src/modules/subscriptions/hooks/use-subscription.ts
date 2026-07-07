@@ -28,6 +28,9 @@ export const useSubscription = ({
             trpc.video.getOne.queryFilter({ id: fromVideoId }),
           );
         }
+        queryClient.invalidateQueries(
+          trpc.users.getOne.queryFilter({ id: userId }),
+        );
       },
       onError: (error) => {
         toast.error(error.message || "订阅失败");
@@ -48,6 +51,9 @@ export const useSubscription = ({
             trpc.video.getOne.queryFilter({ id: fromVideoId }),
           );
         }
+        queryClient.invalidateQueries(
+          trpc.users.getOne.queryFilter({ id: userId }),
+        );
       },
       onError: (error) => {
         toast.error(error.message || "取消订阅失败");
