@@ -11,7 +11,7 @@ export const HomeNavbar = () => {
         {/* 菜单和Logo */}
         <div className="flex items-center shrink-0">
           <SidebarTrigger />
-          <Link href="/">
+          <Link href="/" className="hidden md:block">
             <div className="p-2 flex items-center gap-1">
               <Image src="/logo.svg" height={32} width={32} alt="Logo" />
               <p className="text-xl font-semibold tracking-tight">NewTube</p>
