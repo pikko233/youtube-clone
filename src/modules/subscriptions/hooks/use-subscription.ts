@@ -17,6 +17,7 @@ export const useSubscription = ({
   const clerk = useClerk();
   const queryClient = useQueryClient();
   const trpc = useTRPC();
+  // 订阅
   const subscribe = useMutation(
     trpc.subscriptions.create.mutationOptions({
       onSuccess: () => {
@@ -31,6 +32,9 @@ export const useSubscription = ({
         queryClient.invalidateQueries(
           trpc.users.getOne.queryFilter({ id: userId }),
         );
+        queryClient.invalidateQueries(
+          trpc.subscriptions.getMany.infiniteQueryFilter(),
+        );
       },
       onError: (error) => {
         toast.error(error.message || "订阅失败");
@@ -40,6 +44,7 @@ export const useSubscription = ({
       },
     }),
   );
+  // 取消订阅
   const unsubscribe = useMutation(
     trpc.subscriptions.remove.mutationOptions({
       onSuccess: () => {
@@ -53,6 +58,9 @@ export const useSubscription = ({
         }
         queryClient.invalidateQueries(
           trpc.users.getOne.queryFilter({ id: userId }),
+        );
+        queryClient.invalidateQueries(
+          trpc.subscriptions.getMany.infiniteQueryFilter(),
         );
       },
       onError: (error) => {
